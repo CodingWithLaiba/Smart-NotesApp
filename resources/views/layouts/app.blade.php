@@ -15,12 +15,7 @@
     @include('partials.navbar')
 
     <div class="flex">
-
-        {{-- Sidebar (categories + tags) --}}
-        @auth
-        @include('partials.sidebar')
-        @endauth
-
+        
         {{-- Main Content Area --}}
         <main class="flex-1 p-6">
 
