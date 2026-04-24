@@ -26,7 +26,7 @@ class NoteController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
 
@@ -145,9 +145,9 @@ class NoteController extends Controller
     // -------------------------------------------------------
     public function edit($id)
     {
-        $note       = Note::where('user_id', Auth::id())->findOrFail($id);
+        $note = Note::where('user_id', Auth::id())->findOrFail($id);
         $categories = Category::where('user_id', Auth::id())->get();
-        $tags        = Tag::where('user_id', Auth::id())->get();
+         $tags = Tag::where('user_id', Auth::id())->get();
 
         return view('notes.edit', compact('note', 'categories', 'tags'));
     }
