@@ -16,7 +16,6 @@ class LoginController extends Controller
     {
         return view('auth.login');
     }
-
     // -------------------------------------------------------
     // Handle login form submission
     // Route: POST /login
