@@ -87,6 +87,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/theme', [ProfileController::class, 'toggleTheme'])->name('profile.theme');
+//     Route::post('/profile/theme', function () {
+//     session(['dark_mode' => !session('dark_mode', false)]);
+//     return back();
+// })->name('profile.theme');
     
 });
 
@@ -107,6 +111,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // All Notes Management
     Route::get('/notes', [AdminNoteController::class, 'index'])->name('notes.index');
     Route::delete('/notes/{note}', [AdminNoteController::class, 'destroy'])->name('notes.destroy');
+
+    // Categories (Admin)
+    Route::resource('categories', CategoryController::class);
+
+    // Tags (Admin)
+    Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
     
 });
 
