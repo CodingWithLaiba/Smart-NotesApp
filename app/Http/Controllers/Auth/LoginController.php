@@ -12,7 +12,7 @@ class LoginController extends Controller
     // Show the login form
     // Route: GET /login
     // -------------------------------------------------------
-    public function showForm()
+    public function showLoginForm()
     {
         return view('auth.login');
     }
