@@ -31,7 +31,12 @@ class AdminNoteController extends Controller
  
         $notes = $query->latest()->paginate(20);
  
-        return view('admin.notes.index', compact('notes'));
+        //return view('admin.notes.index', compact('notes'));
+
+        return view('admin.notes.index', [
+        'notes' => $notes,
+        'user' => null, // ✅ FIX HERE
+    ]);
     }
  
     /**
