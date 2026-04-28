@@ -14,14 +14,18 @@ class TrashController extends Controller
      * Route: GET /trash
      */
     public function index()
-    {
-        /** @var User $user */
-        $user = Auth::user(); // Now Intelephense knows $user is a User model
+{
+    /** @var User $user */
+    $user = Auth::user();
 
-        $notes = $user->notes()->onlyTrashed()->latest('deleted_at')->get();
+    $notes = $user->notes()
+        ->onlyTrashed()
+        ->latest('deleted_at')
+        ->paginate(10)   // ✅ instead of get()
+        ->withQueryString();
 
-        return view('notes.trash', compact('notes'));
-    }
+    return view('notes.trash', compact('notes'));
+}
 
     /**
      * Restore a trashed note back to normal.
