@@ -1,4 +1,3 @@
-<!-- top navigation bar -->
 <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
@@ -6,9 +5,15 @@
         <div class="flex items-center gap-6">
 
             {{-- Logo --}}
-            <a href="{{ route('notes.index') }}"
-                class="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                Smart Notes
+            <a href="{{ route('notes.index') }}" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 bg-linear-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:scale-110 transition">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+                <span class="text-xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Smart Notes
+                </span>
             </a>
 
             @auth
@@ -34,45 +39,72 @@
 
             @auth
 
-            {{-- Search --}}
-            <form method="GET" action="{{ route('notes.index') }}" class="hidden sm:block">
-                <input
-                    type="text"
-                    name="search"
-                    placeholder="Search notes..."
-                    value="{{ request('search') }}"
-                    class="border rounded px-3 py-1 text-sm dark:bg-gray-700 dark:border-gray-600" />
+            {{-- Search bar --}}
+            <form method="GET" action="{{ route('notes.index') }}" class="hidden md:block">
+                <div class="relative">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Search notes..."
+                        value="{{ request('search') }}"
+                        class="w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
             </form>
 
-            {{-- Theme Toggle --}}
-            <form method="POST" action="{{ route('profile.theme') }}">
-                @csrf
-                <button type="submit"
-                    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                    title="Toggle theme">
-                    {{ auth()->user()->theme === 'dark' ? '☀️' : '🌙' }}
-                </button>
-            </form>
+            {{-- Dark mode toggle --}}
+            <button @click="darkMode = !darkMode; fetch('{{ route('profile.theme') }}', { method: 'POST', headers: {'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content'), 'Content-Type': 'application/json'}, body: JSON.stringify({theme: darkMode ? 'dark' : 'light'}) })" 
+                    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                    :title="darkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+                
+                <template x-if="!darkMode">
+                    {{-- Moon icon (shown in light mode) --}}
+                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                    </svg>
+                </template>
+                
+                <template x-if="darkMode">
+                    {{-- Sun icon (shown in dark mode) --}}
+                    <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                    </svg>
+                </template>
+                
+            </button>
 
-            {{-- Profile --}}
-            <a href="{{ route('profile.edit') }}"
-                class="hover:underline text-gray-700 dark:text-gray-300">
-                {{ auth()->user()->name }}
+            {{-- User dropdown --}}
+            <div class="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <div class="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+                <div class="hidden md:block">
+                    <p class="font-medium text-gray-700 dark:text-gray-200">{{ auth()->user()->name }}</p>
+                    <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
+                </div>
+            </div>
+
+            <a href="{{ route('profile.edit') }}" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition" title="Profile">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
             </a>
 
-            {{-- Logout --}}
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}" class="inline">
                 @csrf
-                <button class="text-red-500 hover:underline">
-                    Logout
+                <button class="p-2 rounded-lg hover:bg-red-50 text-red-600 dark:hover:bg-red-900/20 transition" title="Logout">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
                 </button>
             </form>
 
             @else
-
-            {{-- Guest Links --}}
-            <a href="{{ route('login') }}" class="hover:underline">Login</a>
-            <a href="{{ route('register') }}" class="hover:underline">Register</a>
+            <a href="{{ route('login') }}" class="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium">Login</a>
+            <a href="{{ route('register') }}" class="px-4 py-2 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition font-medium">Get Started</a>
 
             @endauth
 
