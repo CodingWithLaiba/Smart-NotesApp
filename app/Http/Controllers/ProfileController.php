@@ -73,4 +73,17 @@ class ProfileController extends Controller
 
         return redirect()->route('profile.edit')->with('success', 'Password changed successfully!');
     }
+    public function toggleTheme(Request $request)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Toggle between light and dark
+        $newTheme = $user->theme === 'dark' ? 'light' : 'dark';
+
+        $user->update(['theme' => $newTheme]);
+
+        return back();
+    }
 }
+

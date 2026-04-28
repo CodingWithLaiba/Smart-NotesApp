@@ -31,12 +31,13 @@ class NoteController extends Controller
         }
 
         // --- FILTER by pinned ---
-        if ($request->filled('pinned')) {
+        if ($request->filter === 'pinned') {
             $query->where('is_pinned', true);
         }
 
+
         // --- FILTER by favorites ---
-        if ($request->filled('favorite')) {
+        if ($request->filter === 'favorites') {
             $query->where('is_favorite', true);
         }
 
@@ -69,7 +70,7 @@ class NoteController extends Controller
         $query->orderBy('is_pinned', 'desc');
 
         // Get the results
-        $notes = $query->get();
+        $notes = $query->paginate(10);
 
         // Get all categories and tags for the filter sidebar
         $categories = Category::where('user_id', Auth::id())->get();
@@ -147,7 +148,7 @@ class NoteController extends Controller
     {
         $note = Note::where('user_id', Auth::id())->findOrFail($id);
         $categories = Category::where('user_id', Auth::id())->get();
-         $tags = Tag::where('user_id', Auth::id())->get();
+        $tags = Tag::where('user_id', Auth::id())->get();
 
         return view('notes.edit', compact('note', 'categories', 'tags'));
     }
