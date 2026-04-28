@@ -86,6 +86,7 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
     Route::post('/profile/theme', [ProfileController::class, 'toggleTheme'])->name('profile.theme');
 //     Route::post('/profile/theme', function () {
 //     session(['dark_mode' => !session('dark_mode', false)]);
@@ -97,6 +98,7 @@ Route::middleware('auth')->group(function () {
 // ══════════════════════════════════════════════════════════════
 // ADMIN ROUTES (Admin only)
 // ══════════════════════════════════════════════════════════════
+// Admin-Login
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     
@@ -117,6 +119,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Tags (Admin)
     Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
+
     
 });
 
