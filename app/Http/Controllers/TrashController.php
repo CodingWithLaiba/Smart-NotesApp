@@ -6,6 +6,7 @@ use App\Models\Note;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class TrashController extends Controller
 {
@@ -54,6 +55,9 @@ class TrashController extends Controller
 
         $note = $user->notes()->onlyTrashed()->findOrFail($id);
 
+        if ($note->image_path) {
+            Storage::disk('public')->delete($note->image_path);
+        }
         $note->forceDelete(); // Removes completely from the database
 
         return redirect()->route('trash.index')->with('success', 'Note permanently deleted.');
@@ -68,6 +72,12 @@ class TrashController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
+        $trashedNotes = $user->notes()->onlyTrashed()->get(['id', 'image_path']);
+        foreach ($trashedNotes as $note) {
+            if ($note->image_path) {
+                Storage::disk('public')->delete($note->image_path);
+            }
+        }
         $user->notes()->onlyTrashed()->forceDelete();
 
         return redirect()->route('trash.index')->with('success', 'Trash emptied successfully.');
