@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class NoteController extends Controller
 {
@@ -69,8 +70,7 @@ class NoteController extends Controller
         // Pinned notes always come first, regardless of sort
         $query->orderBy('is_pinned', 'desc');
 
-        // Get the results
-        $notes = $query->paginate(10);
+        $notes = $query->with(['tags', 'categories'])->paginate(10);
 
         // Get all categories and tags for the filter sidebar
         $categories = Category::where('user_id', Auth::id())->get();
@@ -98,21 +98,26 @@ class NoteController extends Controller
     // -------------------------------------------------------
     public function store(Request $request)
     {
-        // Validate inputs
         $request->validate([
             'title'   => 'required|string|max:255',
             'content' => 'nullable|string',
-            'color'   => 'nullable|string|max:20',  // e.g. "#ffeb3b" or "yellow"
+            'color'   => 'nullable|string|max:20',
+            'image'   => 'nullable|image|mimes:jpeg,jpg,png,webp,gif|max:5120',
         ]);
 
-        // Create the note
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('note-images', 'public');
+        }
+
         $note = Note::create([
             'user_id'     => Auth::id(),
             'title'       => $request->title,
             'content'     => $request->content,
-            'color'       => $request->color ?? '#ffffff', // default white
-            'is_pinned'   => false,
-            'is_favorite' => false,
+            'color'       => $request->color ?? 'white',
+            'image_path'  => $imagePath,
+            'is_pinned'   => $request->boolean('is_pinned'),
+            'is_favorite' => $request->boolean('is_favorite'),
         ]);
 
         // Attach categories if any were selected (many-to-many)
@@ -165,13 +170,30 @@ class NoteController extends Controller
             'title'   => 'required|string|max:255',
             'content' => 'nullable|string',
             'color'   => 'nullable|string|max:20',
+            'image'   => 'nullable|image|mimes:jpeg,jpg,png,webp,gif|max:5120',
+            'remove_image' => 'nullable|boolean',
         ]);
+
+        $imagePath = $note->image_path;
+        if ($request->boolean('remove_image') && $note->image_path) {
+            Storage::disk('public')->delete($note->image_path);
+            $imagePath = null;
+        }
+        if ($request->hasFile('image')) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $imagePath = $request->file('image')->store('note-images', 'public');
+        }
 
         // Update the note fields
         $note->update([
             'title'   => $request->title,
             'content' => $request->content,
             'color'   => $request->color ?? $note->color,
+            'image_path' => $imagePath,
+            'is_pinned'   => $request->boolean('is_pinned'),
+            'is_favorite' => $request->boolean('is_favorite'),
         ]);
 
         // Sync categories — sync() will add new and remove old ones
