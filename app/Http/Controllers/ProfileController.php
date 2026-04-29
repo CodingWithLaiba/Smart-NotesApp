@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
@@ -28,18 +28,17 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         /** @var User $user */
-        $user = Auth::user(); // Now Intelephense knows $user has update(), password, etc.
+        $user = Auth::user();
 
         $request->validate([
             'name'  => 'required|string|max:255',
-            // 'unique:users,email,{id}' means: email must be unique BUT ignore this user's own email
             'email' => 'required|email|unique:users,email,' . $user->id,
         ]);
 
         $user->update([
             'name'      => $request->name,
             'email'     => $request->email,
-            'dark_mode' => $request->boolean('dark_mode'), // saves dark/light mode preference
+            'theme'     => $request->boolean('dark_mode') ? 'dark' : 'light',
         ]);
 
         return redirect()->route('profile.edit')->with('success', 'Profile updated!');
@@ -54,21 +53,13 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        $request->validate([
-            'current_password' => 'required|string',
-            'password'         => 'required|string|min:6|confirmed', // needs password_confirmation field
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password'         => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        // Verify that the current password they typed is correct
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors([
-                'current_password' => 'Your current password is incorrect.',
-            ]);
-        }
-
-        // Save the new hashed password
         $user->update([
-            'password' => Hash::make($request->password),
+            'password' => $validated['password'],
         ]);
 
         return redirect()->route('profile.edit')->with('success', 'Password changed successfully!');
