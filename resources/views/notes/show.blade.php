@@ -48,6 +48,12 @@
         </div>
     </div>
 
+    @if($note->image_path)
+    <div class="mb-4">
+        <img src="{{ asset('storage/' . $note->image_path) }}" alt="Note image" class="w-full max-h-96 object-contain rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+    </div>
+    @endif
+
     {{-- Note content --}}
     <div class="bg-white dark:bg-gray-800 rounded shadow p-6 prose dark:prose-invert max-w-none">
         {!! $note->content !!}
