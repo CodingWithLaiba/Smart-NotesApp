@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+use Illuminate\Support\Facades\Hash;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -67,4 +68,48 @@ class LoginController extends Controller
 
         return redirect()->route('login')->with('success', 'You have been logged out.');
     }
+    /**
+ * Show the admin login form.
+ */
+public function showAdminLoginForm()
+{
+    return view('auth.admin-login');
+}
+
+/**
+ * Handle an admin login attempt.
+ */
+public function adminLogin(\Illuminate\Http\Request $request)
+{
+    $credentials = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'email' => 'These credentials do not match our records.',
+        ]);
+    }
+
+    // Must be an admin
+    if (! Auth::user()->is_admin) {
+        Auth::logout();
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'email' => 'This account does not have admin access.',
+        ]);
+    }
+
+    // Block check
+    if (Auth::user()->is_blocked) {
+        Auth::logout();
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'email' => 'Your account has been blocked.',
+        ]);
+    }
+
+    $request->session()->regenerate();
+
+    return redirect()->route('admin.dashboard');
+}
 }
