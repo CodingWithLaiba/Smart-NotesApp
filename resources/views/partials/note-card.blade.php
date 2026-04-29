@@ -33,6 +33,10 @@ $colorClass = $colorClasses[$note->color] ?? $colorClasses['white'];
         {{ $note->title }}
     </h3>
 
+    @if($note->image_path)
+    <img src="{{ asset('storage/' . $note->image_path) }}" alt="Note image" class="w-full h-36 object-cover rounded-lg border border-gray-200 dark:border-gray-700">
+    @endif
+
     {{-- Content preview --}}
     <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-4 grow">
         {{ strip_tags($note->content) }}
@@ -43,7 +47,7 @@ $colorClass = $colorClasses[$note->color] ?? $colorClasses['white'];
     <div class="flex flex-wrap gap-1.5">
         @foreach($note->tags->take(3) as $tag)
         <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs px-2 py-0.5 rounded-full">
-            #{{ $tag->name }}
+            🏷️ {{ $tag->name }}
         </span>
         @endforeach
         @if($note->tags->count() > 3)
@@ -51,6 +55,21 @@ $colorClass = $colorClasses[$note->color] ?? $colorClasses['white'];
         @endif
     </div>
     @endif
+    {{-- Catagories --}}
+    @if($note->categories->count())
+    <div class="flex flex-wrap gap-1.5">
+        @foreach($note->categories->take(3) as $category)
+        <span class="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-xs px-2 py-0.5 rounded-full">
+        🎯 {{ $category->name }}
+        </span>
+        @endforeach
+        @if($note->categories->count() > 3)
+        <span class="text-xs text-gray-500 dark:text-gray-400 px-1">+{{ $note->categories->count() - 3 }}</span>
+        @endif
+    </div>
+    @endif
+
+    
 
     {{-- Footer --}}
     <div class="flex justify-between items-center mt-2 pt-3 border-t border-gray-200 dark:border-gray-700">
