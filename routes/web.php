@@ -16,6 +16,10 @@ use App\Http\Controllers\Admin\AdminNoteController;
 // ══════════════════════════════════════════════════════════════
 // PUBLIC ROUTES (Guests only)
 // ══════════════════════════════════════════════════════════════
+// Admin Login
+Route::get('/admin/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
+Route::post('/admin/login', [LoginController::class, 'adminLogin']);
+
 
 Route::middleware('guest')->group(function () {
     
@@ -69,9 +73,7 @@ Route::middleware('auth')->group(function () {
     // TAGS
     // ─────────────────────────────────────────────────────────
     
-    Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
-    Route::post('/tags', [TagController::class, 'store'])->name('tags.store');
-    Route::delete('/tags/{tag}', [TagController::class, 'destroy'])->name('tags.destroy');
+    Route::resource('tags', TagController::class);
     
     // ─────────────────────────────────────────────────────────
     // EXPORT
@@ -98,7 +100,7 @@ Route::middleware('auth')->group(function () {
 // ══════════════════════════════════════════════════════════════
 // ADMIN ROUTES (Admin only)
 // ══════════════════════════════════════════════════════════════
-// Admin-Login
+
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     
