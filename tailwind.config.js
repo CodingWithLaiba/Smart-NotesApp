@@ -1,17 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./resources/views/**/*.blade.php",
-    "./resources/js/**/*.js",
-    "./resources/js/**/*.vue",
-  ],
   darkMode: 'class',
+  content: [
+    './resources/**/*.blade.php',
+    './resources/**/*.js',
+    './resources/**/*.vue',
+  ],
   theme: {
-    extend: {
-      fontFamily: {
-        sans: ['Outfit', 'sans-serif'],
-      },
-    },
+    extend: {},
   },
   plugins: [],
 }
