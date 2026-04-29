@@ -18,6 +18,7 @@ class Note extends Model
         'title',
         'content',
         'color',
+        'image_path',
         'is_pinned',
         'is_favorite',
     ];
