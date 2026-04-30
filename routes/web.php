@@ -20,6 +20,10 @@ use App\Http\Controllers\Admin\AdminNoteController;
 Route::get('/admin/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
 Route::post('/admin/login', [LoginController::class, 'adminLogin']);
 
+// Admin Register (enabled only if no admin exists yet, or current user is admin)
+Route::get('/admin/register', [RegisterController::class, 'showAdminRegistrationForm'])->name('admin.register');
+Route::post('/admin/register', [RegisterController::class, 'registerAdmin'])->name('admin.register.store');
+
 
 Route::middleware('guest')->group(function () {
     
@@ -109,11 +113,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // User Management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}/notes', [AdminUserController::class, 'notes'])->name('users.notes');
     Route::patch('/users/{user}/block', [AdminUserController::class, 'toggleBlock'])->name('users.block');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     
     // All Notes Management
     Route::get('/notes', [AdminNoteController::class, 'index'])->name('notes.index');
+    Route::get('/notes/{note}', [AdminNoteController::class, 'show'])->name('notes.show');
     Route::delete('/notes/{note}', [AdminNoteController::class, 'destroy'])->name('notes.destroy');
 
     // Categories (Admin)
