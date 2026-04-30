@@ -110,36 +110,37 @@
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">All Tags</h2>
             <div class="flex gap-2">
-                <button onclick="showView('cloud')" id="cloudView" class="px-3 py-1 text-sm rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button onclick="showView('cloud')" id="cloudView" class="px-3 py-1 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"><svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    Cloud
-                </button>
-                <button onclick="showView('grid')" id="gridView" class="px-3 py-1 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    </svg>Cloud</button>
+                <button onclick="showView('grid')" id="gridView" class="px-3 py-1 text-sm rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                    Grid
-                </button>
+                    </svg>Grid</button>
             </div>
         </div>
 
         {{-- Cloud View --}}
-        <div id="cloudViewContent" class="flex flex-wrap gap-3">
+        <div id="cloudViewContent" class="hidden flex flex-wrap gap-3">
             @foreach($tags as $tag)
-            <a href="{{ route('notes.index', ['tag' => $tag->id]) }}"
-                class="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-                <span class="font-medium text-blue-700 dark:text-blue-300">#{{ $tag->name }}</span>
-                <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs rounded-full">
-                    {{ $tag->notes_count }}
-                </span>
-            </a>
+            <div class="group inline-flex items-center gap-2 px-3 py-2 rounded-full bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+                <a href="{{ route('notes.index', ['tag' => $tag->id]) }}" class="inline-flex items-center gap-2">
+                    <span class="font-medium text-blue-700 dark:text-blue-300">#{{ $tag->name }}</span>
+                    <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs rounded-full">
+                        {{ $tag->notes_count }}
+                    </span>
+                </a>
+                <form method="POST" action="{{ route('tags.destroy', $tag) }}" onsubmit="return confirm('Delete this tag?')" class="inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-red-500 hover:text-red-600 text-xs font-semibold px-1" title="Delete tag">❌</button>
+                </form>
+            </div>
             @endforeach
         </div>
 
         {{-- Grid View --}}
-        <div id="gridViewContent" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div id="gridViewContent" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             @foreach($tags as $tag)
             <div class="group bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200">
                 <div class="flex items-center justify-between mb-3">
@@ -155,6 +156,11 @@
                     <div class="flex items-center gap-2">
                         <a href="{{ route('tags.show', $tag) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium">View</a>
                         <a href="{{ route('tags.edit', $tag) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 text-sm font-medium">Edit</a>
+                        <form method="POST" action="{{ route('tags.destroy', $tag) }}" onsubmit="return confirm('Delete this tag?')" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium">Delete</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -183,27 +189,27 @@
 </div>
 
 <script>
-    function showView(view) {
+     function showView(view) {
         const cloudView = document.getElementById('cloudView');
         const gridView = document.getElementById('gridView');
         const cloudContent = document.getElementById('cloudViewContent');
         const gridContent = document.getElementById('gridViewContent');
-        
-        if (view === 'cloud') {
-            cloudView.className = 'px-3 py-1 text-sm rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800';
-            gridView.className = 'px-3 py-1 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700';
-            cloudContent.classList.remove('hidden');
-            gridContent.classList.add('hidden');
-            gridContent.classList.remove('grid');
-        } else {
+
+        if (view === 'grid') {
             gridView.className = 'px-3 py-1 text-sm rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800';
             cloudView.className = 'px-3 py-1 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700';
             gridContent.classList.remove('hidden');
             gridContent.classList.add('grid');
             cloudContent.classList.add('hidden');
+
+        } else {
+            cloudView.className = 'px-3 py-1 text-sm rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800';
+            gridView.className = 'px-3 py-1 text-sm rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700';
+            cloudContent.classList.remove('hidden');
+            gridContent.classList.add('hidden');
+            gridContent.classList.remove('grid');
         }
     }
-
     const tagSearchInput = document.getElementById('tagSearch');
     if (tagSearchInput) {
         tagSearchInput.addEventListener('input', function(e) {
