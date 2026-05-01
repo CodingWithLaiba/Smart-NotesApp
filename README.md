@@ -406,7 +406,7 @@ npm run dev
 
 ## 👩‍💻 Author
 
-*Riha Shehzadi & Laiba Ijaz* 
+*Riha Shehzadi & Laiba Ijaz* <br>
 Software Engineer | Frontend & Backend Developer
 
 ## 🤝 Collaboration
