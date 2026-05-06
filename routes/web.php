@@ -113,7 +113,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // User Management
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
-    Route::get('/users/{user}/notes', [AdminUserController::class, 'notes'])->name('users.notes');
+    Route::get('/users/{user}/notes', [AdminUserController::class, 'userNotes'])->name('users.notes');
     Route::patch('/users/{user}/block', [AdminUserController::class, 'toggleBlock'])->name('users.block');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     
